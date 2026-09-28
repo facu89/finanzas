@@ -1,11 +1,11 @@
 import { AlertTriangle, TrendingDown, Target } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { BudgetEdit } from './BudgetEdit'
 
-export function ExpenseInsights({ transactions }: { transactions: any[] }) {
+export function ExpenseInsights({ transactions, budget }: { transactions: any[], budget: number }) {
   const gastos = transactions.filter(t => t.type === 'gasto')
   const totalGastos = gastos.reduce((acc, t) => acc + Number(t.amount), 0)
   
-  // Encontrar categoría con más gasto
   const catMap = new Map<string, number>()
   gastos.forEach(t => {
     const catName = t.categories?.name || 'Otros'
@@ -21,9 +21,7 @@ export function ExpenseInsights({ transactions }: { transactions: any[] }) {
     }
   })
 
-  // Presupuesto base mensual para ejemplo de herramienta de control
-  const presupuestoMensualBase = 3000 
-  const porcentaje = (totalGastos / presupuestoMensualBase) * 100
+  const porcentaje = (totalGastos / budget) * 100
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
@@ -37,7 +35,7 @@ export function ExpenseInsights({ transactions }: { transactions: any[] }) {
         <CardContent>
           <div className="text-2xl font-bold">{maxCatName}</div>
           <p className="text-xs text-muted-foreground mt-1">
-            Se llevó ${maxCatAmount.toFixed(2)} de tus gastos totales.
+            Se llevó ${maxCatAmount.toFixed(2)} de tus gastos en este periodo.
           </p>
         </CardContent>
       </Card>
@@ -46,13 +44,13 @@ export function ExpenseInsights({ transactions }: { transactions: any[] }) {
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium flex items-center gap-2">
              <Target className="h-4 w-4 text-blue-500" />
-             Control de Presupuesto (Mes Actual)
+             Control de Presupuesto
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex justify-between text-sm mb-1">
+          <div className="flex justify-between items-center text-sm mb-1">
             <span className="font-medium">Consumido: ${totalGastos.toFixed(0)}</span>
-            <span className="text-muted-foreground">Límite: ${presupuestoMensualBase}</span>
+            <BudgetEdit currentBudget={budget} />
           </div>
           <div className="w-full bg-secondary rounded-full h-2.5">
             <div 
@@ -63,7 +61,7 @@ export function ExpenseInsights({ transactions }: { transactions: any[] }) {
           {porcentaje > 90 && (
              <p className="text-xs text-red-500 mt-2 flex items-center gap-1">
                <AlertTriangle className="h-3 w-3" />
-               ¡Peligro! Estás cerca de superar tu presupuesto estimado.
+               ¡Peligro! Estás cerca de superar tu presupuesto límite.
              </p>
           )}
         </CardContent>

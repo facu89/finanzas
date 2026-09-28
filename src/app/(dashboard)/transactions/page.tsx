@@ -1,12 +1,19 @@
-import { TransactionFormModal } from '@/components/transactions/TransactionFormModal'
+import { TransactionFormModal, TransactionRowActions } from '@/components/transactions/TransactionFormModal'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { getTransactions, getAccountsAndCategories } from '@/actions/transactions'
 import { format } from 'date-fns'
+import { MonthPicker } from '@/components/dashboard/MonthPicker'
 
-export default async function TransactionsPage() {
-  const transactions = await getTransactions()
+export default async function TransactionsPage({ searchParams }: { searchParams: { month?: string } }) {
+  const allTransactions = await getTransactions()
   const { accounts, categories } = await getAccountsAndCategories()
+  const selectedMonth = searchParams.month || new Date().toISOString().slice(0, 7)
+
+  // Filtrar
+  const transactions = selectedMonth === 'all' 
+    ? allTransactions 
+    : allTransactions.filter((t: any) => t.date.startsWith(selectedMonth))
 
   return (
     <div className="space-y-6">
@@ -15,11 +22,14 @@ export default async function TransactionsPage() {
           <h2 className="text-3xl font-bold tracking-tight">Transacciones</h2>
           <p className="text-muted-foreground">Gestiona y revisa todo tu historial de movimientos.</p>
         </div>
-        <TransactionFormModal accounts={accounts} categories={categories} />
+        <div className="flex flex-col sm:flex-row items-center gap-2">
+          <MonthPicker currentMonth={selectedMonth} />
+          <TransactionFormModal accounts={accounts} categories={categories} />
+        </div>
       </div>
 
       <div className="rounded-md border bg-card overflow-x-auto w-full">
-        <Table className="min-w-[600px]">
+        <Table className="min-w-[700px]">
           <TableHeader>
             <TableRow>
               <TableHead>Fecha</TableHead>
@@ -28,15 +38,12 @@ export default async function TransactionsPage() {
               <TableHead>Cuenta</TableHead>
               <TableHead>Tipo</TableHead>
               <TableHead className="text-right">Monto</TableHead>
+              <TableHead className="w-[50px]"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {transactions.length === 0 ? (
-               <TableRow>
-                 <TableCell colSpan={6} className="text-center text-muted-foreground py-6">
-                   No hay transacciones registradas.
-                 </TableCell>
-               </TableRow>
+               <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-6">No hay transacciones en este periodo.</TableCell></TableRow>
             ) : (
               transactions.map((tx: any) => (
                 <TableRow key={tx.id}>
@@ -45,12 +52,13 @@ export default async function TransactionsPage() {
                   <TableCell>{tx.categories?.name}</TableCell>
                   <TableCell>{tx.accounts?.name}</TableCell>
                   <TableCell>
-                    <Badge variant={tx.type === 'ingreso' ? 'default' : tx.type === 'gasto' ? 'destructive' : 'secondary'}>
-                      {tx.type}
-                    </Badge>
+                    <Badge variant={tx.type === 'ingreso' ? 'default' : tx.type === 'gasto' ? 'destructive' : 'secondary'}>{tx.type}</Badge>
                   </TableCell>
-                  <TableCell className={`text-right font-bold ${tx.type === 'ingreso' ? 'text-green-600' : tx.type === 'gasto' ? 'text-red-600' : ''}`}>
+                  <TableCell className={`text-right font-bold ${tx.type === 'ingreso' ? 'text-green-600' : 'text-red-600'}`}>
                     {tx.type === 'gasto' ? '-' : ''}${Number(tx.amount).toFixed(2)}
+                  </TableCell>
+                  <TableCell>
+                    <TransactionRowActions transaction={tx} accounts={accounts} categories={categories} />
                   </TableCell>
                 </TableRow>
               ))

@@ -3,26 +3,31 @@ import { OverviewChart } from '@/components/dashboard/OverviewChart'
 import { CategoryPieChart } from '@/components/dashboard/CategoryPieChart'
 import { ExpenseInsights } from '@/components/dashboard/ExpenseInsights'
 import { ArrowUpRight, ArrowDownRight, Wallet } from 'lucide-react'
-import { getTransactions } from '@/actions/transactions'
+import { getTransactions, getBudget } from '@/actions/transactions'
+import { MonthPicker } from '@/components/dashboard/MonthPicker'
 
-export default async function DashboardPage() {
-  const transactions = await getTransactions()
+export default async function DashboardPage({ searchParams }: { searchParams: { month?: string } }) {
+  const allTransactions = await getTransactions()
+  const budget = await getBudget()
+  const selectedMonth = searchParams.month || new Date().toISOString().slice(0, 7)
 
-  const ingresosTotales = transactions
-    .filter((t: any) => t.type === 'ingreso')
-    .reduce((acc: number, t: any) => acc + Number(t.amount), 0)
+  // Filtrar por el mes seleccionado
+  const transactions = selectedMonth === 'all' 
+    ? allTransactions 
+    : allTransactions.filter((t: any) => t.date.startsWith(selectedMonth))
 
-  const gastosTotales = transactions
-    .filter((t: any) => t.type === 'gasto')
-    .reduce((acc: number, t: any) => acc + Number(t.amount), 0)
-
+  const ingresosTotales = transactions.filter((t: any) => t.type === 'ingreso').reduce((acc: number, t: any) => acc + Number(t.amount), 0)
+  const gastosTotales = transactions.filter((t: any) => t.type === 'gasto').reduce((acc: number, t: any) => acc + Number(t.amount), 0)
   const balance = ingresosTotales - gastosTotales
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight">Dashboard Analítico</h2>
-        <p className="text-muted-foreground">Métricas, control de presupuesto y flujo de caja.</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">Dashboard Analítico</h2>
+          <p className="text-muted-foreground">Métricas, control de presupuesto y flujo de caja.</p>
+        </div>
+        <MonthPicker currentMonth={selectedMonth} />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -60,12 +65,12 @@ export default async function DashboardPage() {
       </div>
 
       {/* Herramientas de Control e Insights */}
-      <ExpenseInsights transactions={transactions} />
+      <ExpenseInsights transactions={transactions} budget={budget} />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-4">
           <CardHeader>
-            <CardTitle>Flujo de Caja Histórico</CardTitle>
+            <CardTitle>Flujo de Caja {selectedMonth === 'all' ? 'Histórico' : 'Mensual'}</CardTitle>
           </CardHeader>
           <CardContent className="pl-2">
             <OverviewChart transactions={transactions} />
