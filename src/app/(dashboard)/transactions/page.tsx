@@ -10,7 +10,7 @@ export default async function TransactionsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Transacciones</h2>
           <p className="text-muted-foreground">Gestiona y revisa todo tu historial de movimientos.</p>
@@ -18,8 +18,8 @@ export default async function TransactionsPage() {
         <TransactionFormModal accounts={accounts} categories={categories} />
       </div>
 
-      <div className="rounded-md border bg-card">
-        <Table>
+      <div className="rounded-md border bg-card overflow-x-auto w-full">
+        <Table className="min-w-[600px]">
           <TableHeader>
             <TableRow>
               <TableHead>Fecha</TableHead>
