@@ -76,12 +76,12 @@ export async function getAccountsAndCategories() {
   if (accountsRes.data?.length === 0) {
     const { data: { user } } = await supabase.auth.getUser()
     if (user) {
-       await supabase.from('accounts').insert({ user_id: user.id, name: 'Principal', type: 'banco', balance: 0 } as any)
-       await supabase.from('categories').insert([
-         { user_id: user.id, name: 'Salario', type: 'ingreso', color_hex: '#22c55e' },
-         { user_id: user.id, name: 'Alimentación', type: 'gasto', color_hex: '#ef4444' },
-         { user_id: user.id, name: 'Suscripciones', type: 'gasto', color_hex: '#3b82f6' }
-       ] as any)
+       await (supabase as any).from('accounts').insert({ user_id: user.id, name: 'Principal', type: 'banco', balance: 0 })
+       await (supabase as any).from('categories').insert([
+         { user_id: user.id, name: 'Salario', type: 'ingreso' },
+         { user_id: user.id, name: 'Alimentación', type: 'gasto' },
+         { user_id: user.id, name: 'Suscripciones', type: 'gasto' }
+       ])
        const [newAcc, newCat] = await Promise.all([supabase.from('accounts').select('*'), supabase.from('categories').select('*')])
        return { accounts: newAcc.data || [], categories: newCat.data || [] }
     }

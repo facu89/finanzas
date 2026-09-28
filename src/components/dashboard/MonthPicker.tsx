@@ -7,7 +7,8 @@ export function MonthPicker({ currentMonth }: { currentMonth: string }) {
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  const handleMonthChange = (val: string) => {
+  const handleMonthChange = (val: string | null) => {
+    if (!val) return;
     const params = new URLSearchParams(searchParams.toString())
     if (val === 'all') params.delete('month')
     else params.set('month', val)

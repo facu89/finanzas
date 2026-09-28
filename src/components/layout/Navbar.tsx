@@ -9,11 +9,9 @@ export function Navbar() {
     <header className="flex h-16 items-center justify-between border-b px-4 md:px-6 bg-background">
       <div className="flex items-center gap-4 md:hidden">
         <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="md:hidden">
-              <Menu className="h-5 w-5" />
-              <span className="sr-only">Toggle Menu</span>
-            </Button>
+          <SheetTrigger className="md:hidden p-2 rounded-md hover:bg-accent hover:text-accent-foreground">
+            <Menu className="h-5 w-5" />
+            <span className="sr-only">Toggle Menu</span>
           </SheetTrigger>
           <SheetContent side="left" className="w-[240px] sm:w-[300px]">
             <SheetTitle className="sr-only">Menú de navegación</SheetTitle>

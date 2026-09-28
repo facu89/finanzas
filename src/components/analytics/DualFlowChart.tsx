@@ -52,7 +52,7 @@ export function DualFlowChart({ transactions }: { transactions: any[] }) {
             <XAxis dataKey="month" tickLine={false} axisLine={false} fontSize={12} />
             <YAxis tickFormatter={(val) => `$${(val / 1000)}k`} tickLine={false} axisLine={false} fontSize={12} />
             <Tooltip 
-              formatter={(value: number) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(value)} 
+              formatter={(value: any) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(Number(value))} 
               cursor={{ fill: 'transparent' }} 
             />
             <Legend wrapperStyle={{ paddingTop: '20px' }} />
