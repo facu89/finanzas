@@ -28,7 +28,7 @@ export async function createTransaction(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('No user found')
 
-  const { error } = await supabase.from('transactions').insert({
+  const { error } = await (supabase as any).from('transactions').insert({
     user_id: user.id,
     type: formData.get('type'),
     amount: parseFloat(formData.get('amount') as string),
@@ -46,7 +46,7 @@ export async function createTransaction(formData: FormData) {
 
 export async function updateTransactionAction(id: string, formData: FormData) {
   const supabase = await createClient()
-  await supabase.from('transactions').update({
+  await (supabase as any).from('transactions').update({
     type: formData.get('type'),
     amount: parseFloat(formData.get('amount') as string),
     date: formData.get('date'),
