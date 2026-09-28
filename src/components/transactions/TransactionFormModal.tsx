@@ -37,7 +37,8 @@ function TransactionFormContent({ accounts, categories, tx, open, setOpen }: any
               <Select name="type" defaultValue={tx?.type || "gasto"} required>
                 <SelectTrigger><SelectValue placeholder="Tipo" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="ingreso">Ingreso</SelectItem>
+                  <SelectItem value="ingreso_operativo">Ingreso Operativo (Fijo)</SelectItem>
+                  <SelectItem value="capital_proyectos">Capital Proyectos (Extra)</SelectItem>
                   <SelectItem value="gasto">Gasto</SelectItem>
                   <SelectItem value="transferencia">Transferencia</SelectItem>
                 </SelectContent>

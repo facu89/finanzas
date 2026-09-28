@@ -52,9 +52,9 @@ export default async function TransactionsPage({ searchParams }: { searchParams:
                   <TableCell>{tx.categories?.name}</TableCell>
                   <TableCell>{tx.accounts?.name}</TableCell>
                   <TableCell>
-                    <Badge variant={tx.type === 'ingreso' ? 'default' : tx.type === 'gasto' ? 'destructive' : 'secondary'}>{tx.type}</Badge>
+                    <Badge variant={tx.type === 'ingreso_operativo' || tx.type === 'capital_proyectos' ? 'default' : tx.type === 'gasto' ? 'destructive' : 'secondary'}>{tx.type.replace('_', ' ')}</Badge>
                   </TableCell>
-                  <TableCell className={`text-right font-bold ${tx.type === 'ingreso' ? 'text-green-600' : 'text-red-600'}`}>
+                  <TableCell className={`text-right font-bold ${tx.type === 'ingreso_operativo' || tx.type === 'capital_proyectos' ? 'text-green-600' : tx.type === 'gasto' ? 'text-red-600' : 'text-muted-foreground'}`}>
                     {tx.type === 'gasto' ? '-' : ''}${Number(tx.amount).toFixed(2)}
                   </TableCell>
                   <TableCell>

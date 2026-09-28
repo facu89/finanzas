@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { OverviewChart } from '@/components/dashboard/OverviewChart'
+import { DualFlowChart } from '@/components/analytics/DualFlowChart'
 import { CategoryPieChart } from '@/components/dashboard/CategoryPieChart'
 import { ExpenseInsights } from '@/components/dashboard/ExpenseInsights'
 import { ArrowUpRight, ArrowDownRight, Wallet } from 'lucide-react'
@@ -11,12 +11,11 @@ export default async function DashboardPage({ searchParams }: { searchParams: { 
   const budget = await getBudget()
   const selectedMonth = searchParams.month || new Date().toISOString().slice(0, 7)
 
-  // Filtrar por el mes seleccionado
   const transactions = selectedMonth === 'all' 
     ? allTransactions 
     : allTransactions.filter((t: any) => t.date.startsWith(selectedMonth))
 
-  const ingresosTotales = transactions.filter((t: any) => t.type === 'ingreso').reduce((acc: number, t: any) => acc + Number(t.amount), 0)
+  const ingresosTotales = transactions.filter((t: any) => t.type === 'ingreso_operativo' || t.type === 'capital_proyectos').reduce((acc: number, t: any) => acc + Number(t.amount), 0)
   const gastosTotales = transactions.filter((t: any) => t.type === 'gasto').reduce((acc: number, t: any) => acc + Number(t.amount), 0)
   const balance = ingresosTotales - gastosTotales
 
@@ -73,7 +72,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: { 
             <CardTitle>Flujo de Caja {selectedMonth === 'all' ? 'Histórico' : 'Mensual'}</CardTitle>
           </CardHeader>
           <CardContent className="pl-2">
-            <OverviewChart transactions={transactions} />
+            <DualFlowChart transactions={transactions} />
           </CardContent>
         </Card>
         
