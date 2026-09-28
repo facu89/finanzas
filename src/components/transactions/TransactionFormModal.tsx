@@ -22,11 +22,9 @@ export function TransactionFormModal({ accounts, categories }: { accounts: any[]
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="gap-2">
-          <PlusCircle className="h-4 w-4" /> Nueva Transacción
-        </Button>
-      </DialogTrigger>
+      <Button className="gap-2" onClick={() => setOpen(true)}>
+        <PlusCircle className="h-4 w-4" /> Nueva Transacción
+      </Button>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Registrar Transacción</DialogTitle>

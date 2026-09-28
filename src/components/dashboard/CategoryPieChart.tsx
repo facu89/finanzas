@@ -45,7 +45,7 @@ export function CategoryPieChart({ transactions }: { transactions: any[] }) {
             <Cell key={`cell-${index}`} fill={entry.color} />
           ))}
         </Pie>
-        <Tooltip formatter={(value: number) => `$${value.toFixed(2)}`} />
+        <Tooltip formatter={(value: any) => `$${Number(value).toFixed(2)}`} />
         <Legend verticalAlign="bottom" height={36}/>
       </PieChart>
     </ResponsiveContainer>

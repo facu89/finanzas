@@ -45,7 +45,7 @@ export async function createTransaction(formData: FormData) {
       description,
       account_id,
       category_id,
-    })
+    } as any)
 
   if (error) {
     console.error('Error creating transaction:', error)
@@ -69,12 +69,12 @@ export async function getAccountsAndCategories() {
   if (accountsRes.data?.length === 0) {
     const { data: { user } } = await supabase.auth.getUser()
     if (user) {
-       await supabase.from('accounts').insert({ user_id: user.id, name: 'Principal', type: 'banco', balance: 0 })
+       await supabase.from('accounts').insert({ user_id: user.id, name: 'Principal', type: 'banco', balance: 0 } as any)
        await supabase.from('categories').insert([
          { user_id: user.id, name: 'Salario', type: 'ingreso', color_hex: '#22c55e' },
          { user_id: user.id, name: 'Alimentación', type: 'gasto', color_hex: '#ef4444' },
          { user_id: user.id, name: 'Suscripciones', type: 'gasto', color_hex: '#3b82f6' }
-       ])
+       ] as any)
        
        const [newAcc, newCat] = await Promise.all([
          supabase.from('accounts').select('*'),
