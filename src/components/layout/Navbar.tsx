@@ -1,45 +1,44 @@
-import { LogOut, Menu, Home, ArrowLeftRight } from 'lucide-react'
+'use client'
+
+import { useState, type ReactNode } from 'react'
+import { LogOut, Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { signout } from '@/actions/auth'
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from '@/components/ui/sheet'
-import Link from 'next/link'
+import { Brand, NavLinks } from '@/components/layout/Sidebar'
 
-export function Navbar() {
+export function Navbar({ email, actions }: { email?: string | null, actions?: ReactNode }) {
+  const [open, setOpen] = useState(false)
+
   return (
-    <header className="flex h-16 items-center justify-between border-b px-4 md:px-6 bg-background">
-      <div className="flex items-center gap-4 md:hidden">
-        <Sheet>
-          <SheetTrigger className="md:hidden p-2 rounded-md hover:bg-accent hover:text-accent-foreground">
-            <Menu className="h-5 w-5" />
-            <span className="sr-only">Toggle Menu</span>
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b bg-background/85 px-4 backdrop-blur md:px-8">
+      <div className="flex items-center gap-2 md:hidden">
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetTrigger className="-ml-2 rounded-md p-2 hover:bg-accent" aria-label="Abrir menú">
+            <Menu className="size-5" />
           </SheetTrigger>
-          <SheetContent side="left" className="w-[240px] sm:w-[300px]">
+          <SheetContent side="left" className="w-64 bg-sidebar p-0">
             <SheetTitle className="sr-only">Menú de navegación</SheetTitle>
-            <SheetDescription className="sr-only">Enlaces de navegación de la app</SheetDescription>
-            <div className="py-4">
-              <h2 className="text-xl font-bold tracking-tight text-primary mb-6">FinTech</h2>
-              <nav className="flex flex-col space-y-4">
-                <Link href="/dashboard" className="flex items-center gap-3 text-sm font-medium hover:text-primary">
-                  <Home className="h-4 w-4" />
-                  Dashboard
-                </Link>
-                <Link href="/transactions" className="flex items-center gap-3 text-sm font-medium hover:text-primary">
-                  <ArrowLeftRight className="h-4 w-4" />
-                  Transacciones
-                </Link>
-              </nav>
+            <SheetDescription className="sr-only">Secciones de la aplicación</SheetDescription>
+            <div className="flex h-16 items-center px-5">
+              <Brand />
+            </div>
+            <div className="px-3">
+              <NavLinks onNavigate={() => setOpen(false)} />
             </div>
           </SheetContent>
         </Sheet>
-        <span className="font-bold text-primary">FinTech</span>
+        <Brand />
       </div>
-      <div className="hidden md:block"></div>
-      
-      <div className="flex items-center justify-end gap-4">
+      <div className="hidden md:block" />
+
+      <div className="flex items-center gap-2">
+        {email && <span className="hidden max-w-56 truncate text-xs text-muted-foreground lg:inline">{email}</span>}
+        <div className="hidden md:block">{actions}</div>
         <form action={signout}>
-          <Button variant="ghost" size="sm" type="submit" className="text-muted-foreground hover:text-red-500 transition-colors">
-            <LogOut className="h-4 w-4 md:mr-2" />
-            <span className="hidden md:inline">Cerrar Sesión</span>
+          <Button variant="ghost" size="sm" type="submit" className="h-9 gap-2 text-muted-foreground hover:text-foreground" aria-label="Cerrar sesión">
+            <LogOut className="size-4" />
+            <span className="hidden sm:inline">Salir</span>
           </Button>
         </form>
       </div>

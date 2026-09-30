@@ -32,10 +32,9 @@ export async function proxy(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   // Proteger rutas de la aplicación
-  const isProtectedRoute = 
-    request.nextUrl.pathname.startsWith('/dashboard') || 
-    request.nextUrl.pathname.startsWith('/transactions')
-  
+  const { pathname } = request.nextUrl
+  const isProtectedRoute = ['/dashboard', '/transactions', '/reportes'].some(p => pathname === p || pathname.startsWith(`${p}/`))
+
   if (isProtectedRoute && !user) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
@@ -43,10 +42,8 @@ export async function proxy(request: NextRequest) {
   }
 
   // Prevenir que usuarios logueados vean el login/registro
-  const isAuthRoute = 
-    request.nextUrl.pathname.startsWith('/login') || 
-    request.nextUrl.pathname.startsWith('/register')
-    
+  const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/register')
+
   if (isAuthRoute && user) {
     const url = request.nextUrl.clone()
     url.pathname = '/dashboard'
