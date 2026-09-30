@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -18,6 +18,16 @@ export const metadata: Metadata = {
     template: "%s · Finanzas",
   },
   description: "Control de ingresos, gastos y presupuesto personal.",
+  applicationName: "Finanzas",
+  appleWebApp: {
+    capable: true,
+    title: "Finanzas",
+    statusBarStyle: "default",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#faf9f7",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -149,3 +149,23 @@
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.01em;
 }
+
+/* Barra de carga (TopLoader) */
+@keyframes top-loader-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes top-loader-slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(250%); }
+}
+.top-loader {
+  opacity: 0;
+  animation: top-loader-in 200ms ease-out 150ms forwards;
+}
+.top-loader-bar {
+  animation: top-loader-slide 1.1s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .top-loader-bar { animation-duration: 2.4s; }
+}
