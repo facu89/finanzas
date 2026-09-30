@@ -26,6 +26,11 @@ export function Navbar({ email, actions }: { email?: string | null, actions?: Re
             <div className="px-3">
               <NavLinks onNavigate={() => setOpen(false)} />
             </div>
+            {email && (
+              <p className="mt-auto truncate border-t px-5 py-4 text-xs text-muted-foreground">
+                Sesión: <span className="text-foreground">{email}</span>
+              </p>
+            )}
           </SheetContent>
         </Sheet>
         <Brand />

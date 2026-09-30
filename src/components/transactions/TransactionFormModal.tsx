@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState, useTransition, type KeyboardEvent, type ReactNode } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
 import { useForm, useWatch, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { NumericFormat } from 'react-number-format'
@@ -14,7 +15,7 @@ import { QuickAddButton } from '@/components/transactions/QuickAddButton'
 import { saveTransaction, deleteTransaction, createCategory, createAccount, getUniqueMerchants } from '@/actions/transactions'
 import { fetchDolarRates } from '@/actions/dolarAPI'
 import { transactionSchema, type TransactionInput } from '@/lib/schemas'
-import { TYPE_LABELS, isIncome, todayISO } from '@/lib/format'
+import { TYPE_LABELS, currentMonthISO, formatMonth, isIncome, shiftMonth, todayISO } from '@/lib/format'
 import type { Account, AccountType, Category, CategoryType, Transaction, TransactionType } from '@/types/supabase'
 import { cn } from 'cn'
 
@@ -96,9 +97,12 @@ function TransactionForm({ accounts, categories, tx, onClose }: Omit<Transaction
     getUniqueMerchants().then(setMerchants).catch(() => setMerchants([]))
   }, [])
 
-  const [type, accountId, currency, exchangeRate, tags] = useWatch({
+  const router = useRouter()
+  const pathname = usePathname()
+
+  const [type, accountId, currency, exchangeRate, tags, date] = useWatch({
     control,
-    name: ['type', 'account_id', 'currency', 'exchange_rate', 'tags'],
+    name: ['type', 'account_id', 'currency', 'exchange_rate', 'tags', 'date'],
   })
 
   const allAccounts = useMemo(() => mergeById(accounts, extraAccounts), [accounts, extraAccounts])
@@ -147,8 +151,26 @@ function TransactionForm({ accounts, categories, tx, onClose }: Omit<Transaction
         return
       }
       onClose()
+      showMonthOf(data.date)
     })
   }
+
+  // Si el movimiento cae en otro mes del que se está viendo (ej. uno cargado a futuro),
+  // se navega a ese mes para que no parezca que desapareció.
+  const showMonthOf = (date: string) => {
+    if (pathname !== '/dashboard' && pathname !== '/transactions') return
+    const viewed = new URLSearchParams(window.location.search).get('month') ?? currentMonthISO()
+    const target = date.slice(0, 7)
+    if (viewed === 'all' || viewed === target) return
+    router.push(target === currentMonthISO() ? pathname : `${pathname}?month=${target}`, { scroll: false })
+  }
+
+  const today = todayISO()
+  const nextMonthFirst = `${shiftMonth(today.slice(0, 7), 1)}-01`
+  const dateShortcuts = [
+    { label: 'Hoy', value: today },
+    { label: `1° de ${formatMonth(nextMonthFirst.slice(0, 7)).split(' ')[0]}`, value: nextMonthFirst },
+  ]
 
   const handleDelete = () => {
     if (!tx) return
@@ -345,6 +367,25 @@ function TransactionForm({ accounts, categories, tx, onClose }: Omit<Transaction
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Fecha" htmlFor="date" error={errors.date?.message}>
                 <Input id="date" type="date" className="h-10 bg-card" {...register('date')} />
+                <div className="flex flex-wrap gap-1.5">
+                  {dateShortcuts.map(s => (
+                    <button
+                      key={s.value}
+                      type="button"
+                      onClick={() => setValue('date', s.value, { shouldValidate: true })}
+                      aria-pressed={date === s.value}
+                      className={cn(
+                        'h-6 rounded-md border px-2 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground',
+                        date === s.value && 'border-foreground/20 bg-muted text-foreground',
+                      )}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
+                {date > today && (
+                  <p className="text-xs text-muted-foreground">Fecha futura: lo vas a ver en {formatMonth(date.slice(0, 7))}.</p>
+                )}
               </Field>
 
               <Field label="Cuenta" htmlFor="account" error={errors.account_id?.message}>

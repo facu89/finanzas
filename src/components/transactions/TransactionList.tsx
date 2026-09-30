@@ -21,9 +21,10 @@ function normalize(text: string) {
 
 function dayLabel(iso: string) {
   const today = todayISO()
-  const yesterday = new Date(parseDateOnly(today).getTime() - 86_400_000)
-  if (iso === today) return 'Hoy'
-  if (parseDateOnly(iso).getTime() === yesterday.getTime()) return 'Ayer'
+  const offset = Math.round((parseDateOnly(iso).getTime() - parseDateOnly(today).getTime()) / 86_400_000)
+  if (offset === 0) return 'Hoy'
+  if (offset === -1) return 'Ayer'
+  if (offset === 1) return 'Mañana'
   return formatDate(iso, { weekday: 'long', day: 'numeric', month: 'long' })
 }
 
@@ -113,7 +114,12 @@ export function TransactionList({ transactions, accounts, categories }: { transa
             return (
               <section key={day}>
                 <header className="flex items-center justify-between border-b bg-muted/40 px-4 py-2 text-xs font-medium text-muted-foreground first-letter:uppercase">
-                  <span className="capitalize">{dayLabel(day)}</span>
+                  <span className="flex items-center gap-2">
+                    <span className="capitalize">{dayLabel(day)}</span>
+                    {day > todayISO() && (
+                      <span className="rounded bg-capital/10 px-1.5 py-px text-[10px] font-semibold tracking-wide text-capital uppercase">Futuro</span>
+                    )}
+                  </span>
                   <span className="num">{formatMoney(dayTotal, 'ARS', { signed: true })}</span>
                 </header>
                 <ul className="divide-y">

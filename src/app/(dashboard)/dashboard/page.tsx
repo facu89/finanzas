@@ -30,13 +30,17 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const isAll = selectedMonth === 'all'
 
   // Para el gráfico se traen los 6 meses que terminan en el mes elegido.
-  const chartEnd = isAll ? currentMonthISO() : selectedMonth
-  const chartStart = shiftMonth(chartEnd, -5)
+  const selectedStart = isAll ? currentMonthISO() : shiftMonth(selectedMonth, -5)
   const [transactionsInRange, budget, rates] = await Promise.all([
-    getTransactions(isAll ? {} : { from: monthRange(chartStart).from, to: monthRange(chartEnd).to }),
+    getTransactions(isAll ? {} : { from: monthRange(selectedStart).from, to: monthRange(selectedMonth).to }),
     getBudget(),
     fetchDolarRates(),
   ])
+
+  // Con todo el historial, el gráfico llega hasta el movimiento más lejano (puede haber cargados a futuro).
+  const latestMonth = transactionsInRange[0]?.date.slice(0, 7)
+  const chartEnd = isAll ? (latestMonth && latestMonth > currentMonthISO() ? latestMonth : currentMonthISO()) : selectedMonth
+  const chartStart = shiftMonth(chartEnd, -5)
 
   const transactions = isAll ? transactionsInRange : transactionsInRange.filter(t => t.date.startsWith(selectedMonth))
   const { ingresos, gastos, balance } = summarize(transactions, rates.mep)

@@ -5,6 +5,8 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { currentMonthISO, formatMonth, shiftMonth } from '@/lib/format'
 
+const FUTURE_MONTHS = 12
+
 export function MonthPicker({ currentMonth, allowAll = true }: { currentMonth: string, allowAll?: boolean }) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -18,7 +20,9 @@ export function MonthPicker({ currentMonth, allowAll = true }: { currentMonth: s
     router.push(qs ? `?${qs}` : '?', { scroll: false })
   }
 
-  const months = Array.from({ length: 24 }, (_, i) => shiftMonth(thisMonth, -i))
+  // 12 meses a futuro (para movimientos cargados por adelantado) y 24 hacia atrás, del más nuevo al más viejo.
+  const lastMonth = shiftMonth(thisMonth, FUTURE_MONTHS)
+  const months = Array.from({ length: FUTURE_MONTHS + 24 }, (_, i) => shiftMonth(lastMonth, -i))
   if (currentMonth !== 'all' && !months.includes(currentMonth)) months.push(currentMonth)
 
   const items = [
@@ -44,7 +48,7 @@ export function MonthPicker({ currentMonth, allowAll = true }: { currentMonth: s
           ))}
         </SelectContent>
       </Select>
-      <button type="button" className={arrow} aria-label="Mes siguiente" disabled={isAll || currentMonth >= thisMonth} onClick={() => go(shiftMonth(currentMonth, 1))}>
+      <button type="button" className={arrow} aria-label="Mes siguiente" disabled={isAll || currentMonth >= lastMonth} onClick={() => go(shiftMonth(currentMonth, 1))}>
         <ChevronRight className="size-4" />
       </button>
     </div>
